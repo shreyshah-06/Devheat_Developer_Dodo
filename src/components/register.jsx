@@ -1,47 +1,36 @@
 import React, { useState } from "react";
 import SignupImg from "../Assets/signup.svg";
+import { Link } from "react-router-dom";
 
 function Register() {
-  //***********states ***********
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [focused, setFocused] = useState("");
 
-  //sets email as user inputs
   const emailChange = (event) => {
-    const { value } = event.target;
-    setEmail(value);
+    setEmail(event.target.value);
   };
 
-  //sets name as user inputs
   const nameChange = (event) => {
-    const { value } = event.target;
-    setName(value);
+    setName(event.target.value);
   };
 
-  //sets username as user inputs
   const usernameChange = (event) => {
-    const { value } = event.target;
-    setUsername(value);
+    setUsername(event.target.value);
   };
 
-  //sets password as user inputs
   const passwordChange = (event) => {
-    const { value } = event.target;
-    setPassword(value);
+    setPassword(event.target.value);
   };
 
-  //sets confirm password as user inputs
   const confirmPasswordChange = (event) => {
-    const { value } = event.target;
-    setConfirmPassword(value);
+    setConfirmPassword(event.target.value);
   };
 
-  //function after clicking the register button
   const registerClick = async () => {
-    //any field should not be empty
     if (
       name === "" ||
       username === "" ||
@@ -52,7 +41,6 @@ function Register() {
       window.alert("No Field can be empty");
       return;
     }
-    //if password and confirmPassword does not match
     if (password !== confirmPassword) {
       window.alert("Password and Confirm Password don't match");
       setPassword("");
@@ -60,7 +48,6 @@ function Register() {
       return;
     }
 
-    //stringifies data
     const requestBody = JSON.stringify({
       name,
       username,
@@ -68,7 +55,6 @@ function Register() {
       password,
     });
 
-    //sends data to backend and redirects to login page
     try {
       const response = await fetch("http://localhost:4000/api/v1/register", {
         method: "POST",
@@ -83,6 +69,7 @@ function Register() {
       console.log(error);
     }
   };
+
   return (
     <>
       <section
@@ -103,66 +90,94 @@ function Register() {
                 <h1 className="fw-bold">Register</h1>
                 <p>Get Started with demo cash and start your trading journey</p>
               </div>
-              <label className="form-label my-1" style={{ fontSize: "1.5rem" }}>
-                Name
-              </label>
-              <input
-                type="tel"
-                className="form-control my-1 w-75"
-                id="name"
-                placeholder="Enter Your Name"
-                onChange={nameChange}
-                value={name}
-                style={{ width: "95%" }}
-              />
-              <label className="form-label my-1" style={{ fontSize: "1.5rem" }}>
-                Username
-              </label>
-              <input
-                type="tel"
-                className="form-control my-1 w-75"
-                id="name"
-                placeholder="Enter Your Name"
-                onChange={usernameChange}
-                value={username}
-                style={{ width: "95%" }}
-              />
-              <label className="form-label my-1" style={{ fontSize: "1.5rem" }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                className="form-control my-1 w-75"
-                id="email"
-                placeholder="Eg. abc@xyz.com"
-                onChange={emailChange}
-                value={email}
-                style={{ width: "95%" }}
-              />
-              <label className="form-label my-1" style={{ fontSize: "1.5rem" }}>
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-control my-1 w-75"
-                id="password"
-                placeholder="Set A Password"
-                onChange={passwordChange}
-                value={password}
-                style={{ width: "95%" }}
-              />
-              <label className="form-label my-1" style={{ fontSize: "1.5rem" }}>
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                className="form-control my-1 w-75"
-                id="confirmPassword"
-                placeholder="Re-Enter The Password"
-                onChange={confirmPasswordChange}
-                value={confirmPassword}
-                style={{ width: "95%" }}
-              />
+              <div className="input-container pb-1">
+                <input
+                  type="text"
+                  className={`form-control ${
+                    focused === "name" ? "focused" : ""
+                  }`}
+                  id="name"
+                  placeholder="Enter Your Name"
+                  onChange={nameChange}
+                  onFocus={() => setFocused("name")}
+                  onBlur={() => setFocused("")}
+                  value={name}
+                />
+                <label htmlFor="name">Name</label>
+              </div>
+
+              <div className="input-container pb-1">
+                <input
+                  type="text"
+                  className={`form-control ${
+                    focused === "username" ? "focused" : ""
+                  }`}
+                  id="username"
+                  placeholder="Enter Your Username"
+                  onChange={usernameChange}
+                  onFocus={() => setFocused("username")}
+                  onBlur={() => setFocused("")}
+                  value={username}
+                />
+                <label htmlFor="username">Username</label>
+              </div>
+
+              <div className="input-container pb-1">
+                <input
+                  type="email"
+                  className={`form-control ${
+                    focused === "email" ? "focused" : ""
+                  }`}
+                  id="email"
+                  placeholder="Eg. abc@xyz.com"
+                  onChange={emailChange}
+                  onFocus={() => setFocused("email")}
+                  onBlur={() => setFocused("")}
+                  value={email}
+                />
+                <label htmlFor="email">Email Address</label>
+              </div>
+
+              <div className="input-container pb-1">
+                <input
+                  type="password"
+                  className={`form-control ${
+                    focused === "password" ? "focused" : ""
+                  }`}
+                  id="password"
+                  placeholder="Set A Password"
+                  onChange={passwordChange}
+                  onFocus={() => setFocused("password")}
+                  onBlur={() => setFocused("")}
+                  value={password}
+                />
+                <label htmlFor="password">Password</label>
+              </div>
+
+              <div className="input-container pb-1">
+                <input
+                  type="password"
+                  className={`form-control ${
+                    focused === "confirmPassword" ? "focused" : ""
+                  }`}
+                  id="confirmPassword"
+                  placeholder="Re-Enter The Password"
+                  onChange={confirmPasswordChange}
+                  onFocus={() => setFocused("confirmPassword")}
+                  onBlur={() => setFocused("")}
+                  value={confirmPassword}
+                />
+                <label htmlFor="confirmPassword">Confirm Password</label>
+              </div>
+
+              <div className="row w-100 justify-content-center">
+                <p style={{ fontSize: "1.5rem", color: "#ccc", fontWeight: "bold", fontStyle: "italic" }}>
+                  Already have an account?{" "}
+                  <Link to="/login" style={{ color: "#F49867", fontWeight: "bold" }}>
+                    Login
+                  </Link>
+                </p>
+              </div>
               <div className="row w-100 justify-content-start mt-4 mb-3 mx-0">
                 <div
                   className="btn my-1 p-2 rounded-pill"
@@ -175,9 +190,10 @@ function Register() {
                     width: "11rem",
                   }}
                 >
-                  SignUp
+                  Sign Up
                 </div>
               </div>
+
             </div>
           </div>
         </div>

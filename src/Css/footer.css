@@ -3,35 +3,34 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     background: #040C18;
+    padding: 4rem 1rem;
+    color: #fff;
 }
 
 .footer-heading {
     width: 100%;
     text-align: center;
-
     margin-bottom: 3rem;
 }
 
 .footer-heading h1 {
     font-family: var(--font-family);
     font-weight: 800;
-    font-size: 64px;
-    line-height: 75px;
+    font-size: 48px;
+    line-height: 56px;
 }
 
 .footer-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-
     padding: 1rem;
     border: 1px solid #fff;
     text-align: center;
-
     margin-bottom: 10rem;
     cursor: pointer;
+    transition: background 0.3s ease;
 }
 
 .footer-btn p {
@@ -48,9 +47,9 @@
     align-items: flex-start;
     flex-direction: row;
     flex-wrap: wrap;
-
     width: 100%;
     text-align: left;
+    margin-bottom: 2rem;
 }
 
 .footer-links div {
@@ -61,45 +60,51 @@
 .footer-links_logo {
     display: flex;
     flex-direction: column;
-}
-
-.footer-links_logo img {
-    width: 118px;
-    height: 30px;
-
-    margin-bottom: 1rem;
+    text-align: left;
 }
 
 .footer-links_logo p {
     font-family: var(--font-family);
-    font-size: 12px;
-    line-height: 15px;
+    font-size: 14px;
+    line-height: 18px;
     color: #fff;
 }
 
 .footer-links_div {
     display: flex;
-    justify-content: flex-start;
     flex-direction: column;
 }
 
 .footer-links_div h4 {
-    font-size: 14px;
-    line-height: 17px;
+    font-size: 18px; 
+    font-weight: 700;
     font-family: var(--font-family);
     color: #fff;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    border-bottom: 2px solid #fff;
+    padding-bottom: 0.5rem;
+    letter-spacing: 1px; 
+    transition: color 0.3s ease, transform 0.3s ease;
+}
 
-    margin-bottom: 0.9rem;
+.footer-links_div h4:hover {
+    color: #1e90ff;
+    transform: translateX(5px);
 }
 
 .footer-links_div p {
-    font-size: 12px;
-    line-height: 15px;
+    font-size: 14px;
+    line-height: 18px;
     font-family: var(--font-family);
     color: #fff;
-
     margin: 0.5rem 0;
     cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.footer-links_div p:hover {
+    color: #1e90ff;
 }
 
 .footer-copyright {
@@ -122,14 +127,16 @@
     }
 }
 
-@media screen and (max-width: 550px) {
-    .footer-heading h1 {
-        font-size: 34px;
-        line-height: 42px;
+@media screen and (max-width: 650px) {
+    .footer-links {
+        flex-direction: column;
+        align-items: center;
     }
 
     .footer-links div {
+        width: 100%;
         margin: 1rem 0;
+        text-align: center;
     }
 
     .footer-btn p {
@@ -142,5 +149,10 @@
     .footer-heading h1 {
         font-size: 27px;
         line-height: 38px;
+    }
+
+    .footer-links_div p {
+        font-size: 12px;
+        line-height: 16px;
     }
 }

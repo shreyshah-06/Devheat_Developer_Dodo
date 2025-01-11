@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { Grid, Box, Typography, Paper, Button, Card, CardContent, CardMedia } from "@mui/material";
 import Navbar_loggedin from "../Elements/Navbars/navbar_loggedin";
-import { IconName } from "react-icons/bi";
-import ProfitImg from "../Assets/Profit.svg"
-import WalletImg from "../Assets/Wallet.svg"
-import UserImg from "../Assets/User.svg"
+import ProfitImg from "../Assets/Profit.svg";
+import WalletImg from "../Assets/Wallet.svg";
+import UserImg from "../Assets/User.svg";
 
 function Dashboard() {
-  const [totalProfit, setTotalProfit] = React.useState(0);
-  const [user, setUser] = React.useState({
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [user, setUser] = useState({
     portfolio: [],
     transactions: [],
     balance: 0,
+    username: "Guest",
   });
-  //getting data from api to show on dashboard
+
   const token = localStorage.getItem("user");
+
   const getData = async () => {
     try {
       const response = await fetch("http://localhost:4000/api/v1/dashboard", {
@@ -26,234 +28,133 @@ function Dashboard() {
       });
       const data = await response.json();
       setUser(data.userData);
-      //   console.log("here", user);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
-  //calculating profit
-  React.useEffect(() => {
+
+  useEffect(() => {
     getData();
-    let largest = 0;
     let sum = 0;
-    const Array = user.transactions;
-    console.log("here", Array);
-    for (let index = 0; index < Array.length; index++) {
-      console.log("sum", sum);
-      const element = Array[index];
+    user.transactions.forEach((element) => {
       if (element.trade === "buy") sum -= element.price * element.qty;
       else sum += element.price * element.qty;
-    }
+    });
     setTotalProfit(sum);
-  }, [user.balance]);
+  }, [user.transactions]);
 
-  //displaying portfolio
-  const render = user.portfolio.map((element, index) => {
-    return (
-      <div
-        className="d-flex card flex-row justify-content-around p-1 m-2"
-        key={index}
-      >
-        <div className="col-md-4">
-          <h2 className="text-center">{element.stock}</h2>
-        </div>
-        <div className="col-md-4">
-          <h2 className="text-center">{element.qty}</h2>
-        </div>
-        <div className="col-md-4">
-          <h2 className="text-center">${element.price}</h2>
-        </div>
-      </div>
-    );
-  });
-  //displaying transaction history
-  const historyRender = user.transactions.map((element, index) => {
-    return (
-      <div
-        className="d-flex card flex-row justify-content-around p-1 m-1"
-        key={index}
-      >
-        <div className="col-md-3">
-          <h2 className="text-center">{element.stock}</h2>
-        </div>
-        <div className="col-md-3">
-          <h2 className="text-center text-capitalize">{element.trade}</h2>
-        </div>
-        <div className="col-md-3">
-          <h2 className="text-center">{element.qty}</h2>
-        </div>
-        <div className="col-md-3">
-          <h2 className="text-center">${element.price}</h2>
-        </div>
-      </div>
-    );
-  });
+  const renderPortfolio = user.portfolio.length ? (
+    user.portfolio.map((element, index) => (
+      <Box key={index} display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 2, bgcolor: "rgb(1, 22, 44)", color: "wheat", borderRadius: 2, mb: 1 }}>
+        <Typography variant="h6" sx={{ textTransform: "capitalize" }}>{element.stock}</Typography>
+        <Typography variant="h6">{element.qty}</Typography>
+        <Typography variant="h6">${element.price}</Typography>
+      </Box>
+    ))
+  ) : (
+    <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: "200px", textAlign: "center", bgcolor: "rgb(35, 47, 62)", borderRadius: 2, p: 3 }}>
+      <Typography variant="h6" sx={{ color: "#f2f2f2" }}>No stocks in your portfolio yet. Start investing today!</Typography>
+    </Box>
+  );
+
+  const renderTransactions = user.transactions.length ? (
+    user.transactions.map((element, index) => (
+      <Box key={index} display="flex" justifyContent="space-between" alignItems="center" sx={{ p: 2, bgcolor: "rgb(1, 22, 44)", color: "wheat", borderRadius: 2, mb: 1 }}>
+        <Typography variant="h6" sx={{ textTransform: "capitalize" }}>{element.stock}</Typography>
+        <Typography variant="h6" textTransform="capitalize">{element.trade}</Typography>
+        <Typography variant="h6">{element.qty}</Typography>
+        <Typography variant="h6">${element.price}</Typography>
+      </Box>
+    ))
+  ) : (
+    <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: "200px", textAlign: "center", bgcolor: "rgb(35, 47, 62)", borderRadius: 2, p: 3 }}>
+      <Typography variant="h6" sx={{ color: "#f2f2f2" }}>No transactions yet. Start trading now to see your history!</Typography>
+    </Box>
+  );
+
   return (
-    <>
-      <section className="m-0 p-0" style={{ height: "100vh" }}>
-        <Navbar_loggedin />
-        <div
-          className="d-flex m-0 p-1 justify-content-between"
-          style={{ height: "87vh" }}
-          id="bottom-d-flex"
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+      <Navbar_loggedin />
+      <Grid container sx={{ height: "87vh" }}>
+        <Grid
+          item
+          md={2}
+          sx={{
+            bgcolor: "radial-gradient(circle at 5% 23%, rgba(0, 40, 83, 1) 2%, rgba(4, 12, 24, 1) 25%)",
+            color: "white",
+            py: 2,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: "300px",
+            borderRadius: "15px",
+            boxShadow: "4px 4px 10px rgba(0,0,0,0.2)",
+          }}
         >
-          <div
-            className="col-md-2 d-flex flex-column justify-content-between py-2"
-            id="left-panel"
-            style={{
-              background:
-                "radial-gradient(circle at 5% 23%, rgba(0, 40, 83, 1) 2%, rgba(4, 12, 24, 1) 25%)",
-            }}
-          >
-            <div className="py-3">
-              <div className="p-2 text-center my-4 card text-dark shadow-lg">
-                <h2>Dashboard</h2>
-              </div>
-              <div className="p-2 text-center my-4 text-light">
-                <h2>
-                  <Link to="/analysis">Analysis</Link>
-                </h2>
-              </div>
-              <div className="p-2 text-center my-4 text-light">
-                <h2>Help</h2>
-              </div>
-            </div>
-          </div>
-          <div
-            className="col-md-10 bg-secondary p-2"
-            id="right-panel"
-            style={{ borderRadius: "1.3rem" }}
-          >
-            <div className="d-flex justify-content-around align-items-center h-25 pb-1">
-              <div
-                className="col-md-2 card d-flex flex-row justify-content-between p-2"
-                style={{ borderRadius: "1rem" }}
-              >
-                <div
-                  className="col-3 "
-                  style={{
-                    height: "6rem",
-                    width: "6rem",
-                    borderRadius: "0.5rem",
-                  }}
-                ><img src={UserImg} alt="" /></div>
-                <div className="col-7">
-                  <h2 className="fw-bold ps-1"> Hello,</h2>
-                  <h2 className="fw-bold ps-1">{user.username}</h2>
-                </div>
-              </div>
-              <div
-                className="col-md-2 card d-flex flex-row justify-content-between p-2"
-                style={{ borderRadius: "1rem" }}
-              >
-                <div
-                  className="col-3"
-                  style={{
-                    height: "6rem",
-                    width: "6rem",
-                    borderRadius: "0.5rem",
-                  }}
-                ><img src={ProfitImg} alt="" /></div>
-                <div className="col-7 ">
-                  <h2 className="fw-bold">Profit :</h2>
-                  <h2>${Math.round(totalProfit)}</h2>
-                </div>
-              </div>
-              <div
-                className="col-md-2 card d-flex flex-row justify-content-between p-2"
-                style={{ borderRadius: "1rem" }}
-              >
-                <div
-                  className="col-3"
-                  style={{
-                    height: "6rem",
-                    width: "6rem",
-                    borderRadius: "0.5rem",
-                  }}
-                ><img src={WalletImg} alt="" /></div>
-                <div className="col-7">
-                  <h2 className="fw-bold ">Balance :</h2>
-                  <h2 className="">${Math.round(user.balance)}</h2>
-                </div>
-              </div>
-            </div>
-            <div className="d-flex h-75 justify-content-around">
-              <div
-                className="col-md-7 card p-2"
-                style={{
-                  borderRadius: "1.3rem",
-                  backgroundColor: "rgb(1, 22, 44)"
-                }}
-              >
-                <div
-                  className="d-flex card flex-row justify-content-around p-1 m-2"
-                  style={{ backgroundColor: "rgb(1, 22, 44)" }}
-                >
-                  <div
-                    style={{
-                      color:'wheat'
-                    }}
-                  >
-                    <h1 className="fw-bold">Stock</h1>
-                  </div>
-                  <div
-                    style={{
-                      color:'wheat'
-                    }}
-                  >
-                    <h1 className="fw-bold">Qty</h1>
-                  </div>
-                  <div
-                    style={{
-                      color:'wheat'
-                    }}
-                  >
-                    <h1 className="fw-bold">Price</h1>
-                  </div>
-                </div>
-                {render}
-              </div>
-              <div className="col-md-4 card" style={{ borderRadius: "1.3rem",backgroundColor: "rgb(1, 22, 44)" }}>
-                <div
-                  className="d-flex card flex-row justify-content-around"
-                  style={{ backgroundColor: "rgb(1, 22, 44)",paddingTop:'1.25rem' }}
-                >
-                  <div
-                    style={{
-                      color:'wheat',
-                    }}
-                  >
-                    <h1 className="fw-bold"style={{fontSize:'2.3rem'}}>Stock</h1>
-                  </div>
-                  <div
-                    style={{
-                      color:'wheat'
-                    }}
-                  >
-                    <h1 className="fw-bold"  style={{fontSize:'2.3rem'}}>Trade</h1>
-                  </div>
-                  <div
-                    style={{
-                      color:'wheat'
-                    }}
-                  >
-                    <h1 className="fw-bold" style={{fontSize:'2.3rem'}}>Qty</h1>
-                  </div>
-                  <div
-                    style={{
-                      color:'wheat'
-                    }}
-                  >
-                    <h1 className="fw-bold" style={{fontSize:'2.3rem'}}>Price</h1>
-                  </div>
-                </div>
-                {historyRender}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
+          <Paper elevation={3} sx={{ p: 2, mb: 3, textAlign: "center", backgroundColor: "rgba(190, 190, 190, 0.71)"}}>
+            <Typography variant="h5" sx={{fontWeight: "bold"}}>Dashboard</Typography>
+          </Paper>
+          <Button component={Link} to="/analysis" sx={{ mb: 3, color: "white", textTransform: "capitalize", fontWeight: "bold", fontSize: "16px", '&:hover': { color: "#e0e0e0" } }}>
+            <Typography variant="h5">Analysis</Typography>
+          </Button>
+          <Button sx={{ color: "white", textTransform: "capitalize", fontWeight: "bold", fontSize: "16px", '&:hover': { color: "#e0e0e0" } }}>
+            <Typography variant="h5">Help</Typography>
+          </Button>
+        </Grid>
+        <Grid item md={10} sx={{ p: 2, bgcolor: "#e0e0e0", borderRadius: 3 }}>
+          <Grid container justifyContent="space-around" alignItems="center" sx={{ mb: 4 }}>
+            {[ 
+              { img: UserImg, label: "Hello,", value: user.username },
+              { img: ProfitImg, label: "Profit:", value: `$${Math.round(totalProfit)}` },
+              { img: WalletImg, label: "Balance:", value: `$${Math.round(user.balance)}` },
+            ].map((card, idx) => (
+              <Card key={idx} sx={{ 
+                display: "flex", 
+                alignItems: "center", 
+                width: 300, 
+                p: 2, 
+                borderRadius: 2, 
+                boxShadow: 3, 
+                "&:hover": { 
+                  transform: "scale(1.05)", 
+                  boxShadow: 8, 
+                  transition: "transform 0.3s, box-shadow 0.3s",
+                },
+              }}>
+                <CardMedia component="img" src={card.img} sx={{ width: 80, height: 80, borderRadius: 1, mr: 2 }} />
+                <CardContent>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "capitalize" }}>{card.label}</Typography>
+                  <Typography variant="h5" sx={{ fontWeight: "bold" }}>{card.value}</Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </Grid>
+          <Grid container spacing={4}>
+            <Grid item md={7}>
+              <Paper sx={{ p: 3, bgcolor: "rgb(1, 22, 44)", color: "wheat", borderRadius: 2 }}>
+                <Box display="flex" justifyContent="space-between" sx={{ mb: 2 }}>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Stock</Typography>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Qty</Typography>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Price</Typography>
+                </Box>
+                {renderPortfolio}
+              </Paper>
+            </Grid>
+            <Grid item md={5}>
+              <Paper sx={{ p: 3, bgcolor: "rgb(1, 22, 44)", color: "wheat", borderRadius: 2 }}>
+                <Box display="flex" justifyContent="space-between" sx={{ mb: 2 }}>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Stock</Typography>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Trade</Typography>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Qty</Typography>
+                  <Typography variant="h6" fontWeight="bold" sx={{ textTransform: "uppercase" }}>Price</Typography>
+                </Box>
+                {renderTransactions}
+              </Paper>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }
 
