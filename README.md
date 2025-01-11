@@ -1,8 +1,5 @@
 # PaperMarket
 
-# Topic : FinETech
-# Contents of The Repo : Frontend Branch and Backend Branch
-
 <br/>
 
 <p align="center">
