@@ -1,8 +1,5 @@
 # PaperMarket
 
-# Topic : FinETech
-# Contents of The Repo : Frontend Branch and Backend Branch
-
 <br/>
 
 <p align="center">
@@ -22,8 +19,6 @@
 
 - Using a demo account allows first time traders to experience and trade with an account that looks and acts similarly to the real online trading accounts traders use. 
 
-- Users can also take the assistance of our trained AI, which can make calculated predictions based on the previous performance of a stock.
-
 ```
 <p align="center">
 <img src="./snapshots/img (2).png" width="720"/>
@@ -42,19 +37,7 @@
 
  ```
 
-# Feature 2 : AI Prediction Model
-
-```
-
-- Our trained AI is backed up with statistical data streams of 20+ years.
-
-- Users are given fixed credits on registration, which they can further exchange for a calculated prediction of the share price ahead of its listing. 
-
-- The AI model uses previous performance of a stock in the market to predict its upcoming trend.
-
-```
-
-# Feature 3 : Stock Analysis
+# Feature 2 : Stock Analysis
 
 ```
 
@@ -67,7 +50,7 @@
 ```
 
 
-# Feature 4 : Fully Secured
+# Feature 3 : Fully Secured
 
 ```
 
@@ -102,8 +85,6 @@
 
 - Users can learn how to trade through reading the trends through the chart.
 
-- We have included a small predictor of the trend of the next day for the Users using ML model and are rewarding users with a certain amount(fake).
-
 - The website is fully encrypted.
 
 
@@ -114,7 +95,7 @@
 ## 🛠 Tech Used ||
 
 ```bash
-Python (Machine Learning), TensorFlow, Numpy, Pandas, Sklearn, HTML, CSS, React.js, NodeJS,MongoDB, ExpressJs, JWT
+HTML, CSS, React.js, NodeJS, MongoDB, ExpressJs, JWT, MUI
 ```
 
 ## Problems faced
@@ -129,6 +110,6 @@ Python (Machine Learning), TensorFlow, Numpy, Pandas, Sklearn, HTML, CSS, React.
 
 ## Developers
 
-## [Nachiket](https://github.com/Nach-33), [Rutwik](https://github.com/rutwik2514), [Shrey](https://github.com/shreyshah-06), [Padam](https://github.com/PadamMantry04)
+## [Nachiket](https://github.com/Nach-33), [Rutwik](https://github.com/rutwik2514), [Shrey](https://github.com/shreyshah-06)
 
 <br/>
