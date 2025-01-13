@@ -1,317 +1,541 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Tooltip,
+  Box,
+  TextField,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import Chart from "react-google-charts";
 import Navbar_loggedin from "../Elements/Navbars/navbar_loggedin";
-
-function Apitest() {
-  //***********************************STATES******************************* */
-  const [symbol, setsymbol] = React.useState("");
-  const [data, setData] = React.useState(false);
-  const [status, setStatus] = React.useState("");
-  const [clicked, setClicked] = React.useState("");
-  const [prediction, setPrediction] = React.useState(false);
-  const [graph, setgraph] = React.useState([
-    ["day", "low", "open", "close", "high"],
+import marketData from "../data/MoversData.json";
+function ApiTest() {
+  const [symbol, setSymbol] = useState("");
+  const [data, setData] = useState(null);
+  const [status, setStatus] = useState(null);
+  const [graphData, setGraphData] = useState([
+    ["Day", "Low", "Open", "Close", "High"],
   ]);
+  const [topGainers, setTopGainers] = useState([]);
+  const [topLosers, setTopLosers] = useState([]);
+  const [mostActive, setMostActive] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  
-  //*************graph properties******************* */
-  var options = {
-    legend: "none",
-    backgroundColor: "#040C18",
-
+  const options = {
+    legend: { position: "top" },
+    backgroundColor: "#1e1e2f",
+    hAxis: { title: "Time" },
+    vAxis: { title: "Stock Price" },
     candlestick: {
-      fallingColor: { strokeWidth: 0, fill: "#f6465d" }, // red
-      risingColor: { strokeWidth: 0, fill: "#0ccb80" }, // green
+      fallingColor: { fill: "#f6465d" },
+      risingColor: { fill: "#0ccb80" },
     },
-    colors: ["#808080"],
     explorer: {
-      maxZoomout: 2,
+      maxZoomOut: 2,
       keepInBounds: true,
     },
   };
 
-  //**********************************FUNCTIONS****************************** */
-  function handleChange(e) {
-    const { value } = e.target;
-    setsymbol(value);
-  }
-  async function handleClick(e) {
-    const response = await fetch(
-      `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=JBQTJBWV8LLJYL6Y`
-    )
-      .then((response) => response.json())
-      .then((response) => setData(response))
-      .catch((err) => console.error(err));
-  }
-  function handleClickGraph() {
-    setClicked("hello");
-    class GoogleChart extends Component {
-      constructor(props) {
-        super(props);
-      }
+  const fetchStockData = async () => {
+    if (!symbol) {
+      alert("Please enter a valid stock symbol.");
+      return;
     }
-  }
-  function handleCheckbox1() {
-    setPrediction(true);
-  }
-  function handleCheckbox2() {
-    setPrediction(false);
-  }
-  const token = localStorage.getItem("user");
-  const getPrediction = async () => {
-    let predict = 1;
-    if (!prediction) predict = 0;
-    const response = await fetch("http://localhost:4000/api/v1/prediction", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "BEARER " + token,
-      },
-      body: JSON.stringify({
-        prediction: predict,
-        stock: symbol,
-      }),
-    });
-    const data = await response.json();
-    // console.log(data);
-    if (data.status == "not ok") {
-      if (data.msg == "limit exceeded") {
-        window.alert("Daily Limit Exceeded");
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=5min&apikey=YOUR_API_KEY`
+      );
+      const result = await response.json();
+      if (result.values) {
+        setData(result.values);
+        prepareGraphData(result.values);
       } else {
-        window.alert("Low Balance");
+        alert(result.message || "Invalid Symbol or API Limit Reached.");
       }
-    } else {
-      if (data.win) {
-        Window.alert("Congrats!!! Your Prediction is Accurate...");
-      }
-      else{
-        Window.alert("Alas, Better Luck Next Time...");
-      }
+    } catch (error) {
+      console.error("Error fetching stock data:", error);
     }
+    setLoading(false);
   };
-  //*****************************USEEFFECTS******************************************* */
 
+  const prepareGraphData = (stockData) => {
+    const formattedData = stockData.map((entry) => [
+      entry.datetime,
+      parseFloat(entry.low),
+      parseFloat(entry.open),
+      parseFloat(entry.close),
+      parseFloat(entry.high),
+    ]);
+    setGraphData([graphData[0], ...formattedData]);
+    setStatus(stockData[0]);
+  };
 
-
-  //converting data into format required for candlestick graph
-  React.useEffect(() => {
-    for (var i in data["Time Series (5min)"]) {
-      setStatus(data["Time Series (5min)"][i]);
-      break;
-    }
-    for (var i in data["Time Series (5min)"]) {
-      const temp = [i];
-      for (var j in data["Time Series (5min)"][i]) {
-        if (j == "1. open") {
-          temp.push(parseFloat(data["Time Series (5min)"][i][j]))
-        } else if (j == "2. high") {
-          temp.push(parseFloat(data["Time Series (5min)"][i][j]))
-        } else if (j == "3. low") {
-          temp.push(parseFloat(data["Time Series (5min)"][i][j]))
-        } else if (j == "4. close") {
-          temp.push(parseFloat(data["Time Series (5min)"][i][j]))
-        } 
+  const fetchMarketMovers = async () => {
+    setLoading(true);
+    const apiKey = "YOUR_API_KEY";
+    try {
+      // const response = await fetch(
+      //   `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${apiKey}`
+      // );
+      const result = marketData;
+      if (result && result.metadata) {
+        setTopGainers(result.top_gainers || []);
+        setTopLosers(result.top_losers || []);
+        setMostActive(result.most_actively_traded || []);
+      } else {
+        console.error("Error fetching market movers.");
       }
-      
-      console.log('hi', temp);
-      const temp2 = [];
-      temp2.push(temp[0]);
-      temp2.push(temp[3]);
-      temp2.push(temp[1]);
-      temp2.push(temp[4]);
-      temp2.push(temp[2]);
-      graph.push(temp2);
-      console.log('graph', graph);
+    } catch (error) {
+      console.error("Error fetching market movers:", error);
     }
-    console.log(graph);
-  }, [data["Time Series (5min)"]]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchMarketMovers();
+  }, []);
 
   return (
     <>
       <Navbar_loggedin />
-      <center>
-        <div
-          className="card  "
-          style={{
-            width: "50vw",
-            marginBottom: "8vh",
-            marginTop: "2vh",
-            backgroundColor: "#040C18",
-          }}
-        >
-          <h3
-            style={{
-              color: "white",
-              fontWeight: "bolder",
-              fontSize: "3rem",
-              paddingBottom: "1.5rem",
-            }}
-          >
-            Stocks
-          </h3>
-          <div>
-            <input
-              type="text"
-              className="m-2 rounded-pill p-3"
-              placeholder="Enter stock name"
-              onChange={handleChange}
-              style={{
-                width: "25vw",
-                borderRadius: "3rem",
-                height: "4rem",
-                fontSize: "2rem",
-                textAlign: "center",
-              }}
-            />
-          </div>
+      <main className="container" style={{ color: "white", marginTop: "30px" }}>
+        {/* Search Section */}
+        <Box
+      sx={{
+        textAlign: 'center',
+        padding: '1rem', // Reduced vertical padding for more compact height
+        background: 'linear-gradient(135deg, #0f172a, #2a3650)', // Dark blue gradient background
+        borderRadius: '10px',
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+        maxWidth: 600, // Increased width to make it more spacious
+        margin: '0 auto',
+      }}
+    >
+      <Typography
+        variant="h4"
+        sx={{
+          marginBottom: '1rem', // Reduced margin to balance the height
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '1.8rem',
+        }}
+      >
+        Stock Search
+      </Typography>
 
-          <center className="m-3">
-            <button
-              type="button"
-              className=" btn btn-outline-primary my-1 p-2 rounded-pill"
-              style={{ width: "10rem", fontWeight: "bold", fontSize: "1.5rem" }}
-              onClick={handleClick}
+      {/* Input field */}
+      <TextField
+        value={symbol}
+        onChange={(e) => setSymbol(e.target.value)}
+        placeholder="e.g., AAPL, TSLA"
+        fullWidth
+        variant="outlined"
+        sx={{
+          mb: 2,
+          backgroundColor: 'white',
+          borderRadius: '8px',
+          '& .MuiOutlinedInput-root': {
+            '&:hover fieldset': {
+              borderColor: '#c1c1c1', // Subtle light gray border on hover
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#c1c1c1',
+            },
+          },
+        }}
+        InputProps={{
+          style: {
+            fontSize: '1.2rem',
+            color: '#333', // Dark text for better contrast
+          },
+        }}
+      />
+
+      {/* Search Button */}
+      <Button
+        onClick={fetchStockData}
+        variant="contained"
+        fullWidth
+        sx={{
+          padding: '0.8rem',
+          backgroundColor: '#4e5b6e', // Subtle, muted blue color for button
+          color: 'white',
+          fontSize: '1.2rem',
+          borderRadius: '8px',
+          '&:hover': {
+            backgroundColor: '#65778d', // Slightly lighter blue on hover
+            transform: 'scale(1.05)',
+          },
+          transition: 'transform 0.3s ease, background-color 0.3s',
+        }}
+      >
+        {loading ? <CircularProgress size={24} color="inherit" /> : 'Search'}
+      </Button>
+
+      {/* Loading message */}
+      {loading && (
+        <Typography variant="body2" sx={{ mt: 1, color: 'white' }}>
+          Loading...
+        </Typography>
+      )}
+    </Box>
+
+        {/* Candlestick Chart */}
+        {graphData.length > 1 && (
+          <section className="graph-section" style={{ marginTop: "2rem" }}>
+            <h3
+              style={{
+                textAlign: "center",
+                marginBottom: "1rem",
+                fontSize: "1.8rem",
+                color: "#0ccb80",
+              }}
             >
-              Search
-            </button>
-          </center>
-        </div>
-      </center>
-      {status && (
-        <center>
-          <section
-            style={{
-              border: "1px solid white",
-              borderTopLeftRadius: "25px",
-              borderTopRightRadius: "25px",
-              width: "70vw",
-              background:
-                "radial-gradient(circle at 3% 25%, rgba(0, 40, 83, 1) 0%, rgba(4, 12, 24, 1) 25%)",
-              padding: "2vh",
-            }}
-          >
-            <div>
-              <center>
-                <p
-                  style={{ color: "white", fontSize: "23px" }}
-                  className="fw-bold"
-                >
-                  The Prediction game costs $50, correct guess gives a reward of
-                  $75
-                </p>
-              </center>
-              <center>
-                <p
-                  style={{ color: "white", fontSize: "18px" }}
-                  className="fw-bold"
-                >
-                  Will the stock increase in future? What's your prediction?
-                </p>
-              </center>
-            </div>
-            <div className="d-flex justify-content-center">
-              <input type="radio" onClick={handleCheckbox1} name="1" />
-              <label
-                htmlFor="High"
-                style={{
-                  color: "#A4BE7B",
-                  fontSize: "1.8rem",
-                  fontWeight: "bolder",
-                  padding: "1rem",
-                }}
-              >
-                {" "}
-                High
-              </label>
-              <input type="radio" onClick={handleCheckbox2} name="1" />
-              <label
-                htmlFor="Low"
-                style={{
-                  color: "#A4BE7B",
-                  fontSize: "1.8rem",
-                  fontWeight: "bolder",
-                  padding: "1rem",
-                }}
-              >
-                Low
-              </label>
-              <button
-                type="button"
-                className=" btn my-1 p-2 rounded-pill"
-                style={{
-                  width: "10rem",
-                  fontWeight: "bolder",
-                  fontSize: "1.5rem",
-                  padding: "0.3rem",
-                  backgroundColor: "#E5D9B6",
-                  color: "#285430",
-                }}
-                onClick={getPrediction}
-              >
-                Predict
-              </button>
+              Candlestick Chart
+            </h3>
+            <div
+              style={{
+                background: "#0f172a",
+                padding: "1rem",
+                borderRadius: "10px",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.3)",
+              }}
+            >
+              <Chart
+                width={"100%"}
+                height={450}
+                chartType="CandlestickChart"
+                loader={<div>Loading Chart...</div>}
+                data={graphData}
+                options={options}
+              />
             </div>
           </section>
-        </center>
-      )}
+        )}
 
-      {status && (
-        <center>
-          <div
-            className="shadow p-3 mb-5"
-            style={{
-              width: "70vw",
-              borderBottomLeftRadius: "25px",
-              borderBottomRightRadius: "25px",
-              fontWeight: "bold",
-              fontSize: "2rem",
-              backgroundColor: "#040C18",
-              border: "1px solid white",
-            }}
-          >
+        {/* Stock Status Section */}
+        {status && (
+          <section className="status-section" style={{ marginTop: "2rem" }}>
             <h3
-              className="fw-bold "
-              style={{ color: "white", fontSize: "2.3rem" }}
-            >
-              {" "}
-              Previous one day status :
-            </h3>
-            {status &&
-              Object.keys(status).map(function (key) {
-                return (
-                  <p className="text-capitalize" style={{ color: "white" }}>
-                    {key} : {status[key]}
-                  </p>
-                );
-              })}
-            <button
-              onClick={handleClickGraph}
               style={{
-                borderRadius: "2rem",
-                fontSize: "1.5rem",
-                width: "20rem",
+                textAlign: "center",
+                marginBottom: "1rem",
+                fontSize: "1.8rem",
+                color: "#0ccb80",
               }}
             >
-              Check Graphical Data
-            </button>
-            {clicked && (
-              <div className="container mt-3">
-                <Chart
-                  width={"100%"}
-                  height={450}
-                  chartType="CandlestickChart"
-                  loader={<div>Loading Chart</div>}
-                  data={graph}
-                  options={options}
-                  rootProps={{ "data-testid": "1" }}
-                />
-              </div>
-            )}
+              Stock Status
+            </h3>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "1rem",
+                backgroundColor: "#1e293b",
+                padding: "2rem",
+                borderRadius: "10px",
+              }}
+            >
+              {Object.keys(status).map((key) => (
+                <div
+                  key={key}
+                  style={{
+                    background: key.includes("change") ? "#f6465d" : "#0ccb80",
+                    color: "white",
+                    padding: "1rem",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <strong>{key}:</strong> {status[key]}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Top Gainers, Losers, and Active Stocks */}
+        <section style={{ marginTop: "3rem" }}>
+          {/* Main Title */}
+          <Typography
+            variant="h3"
+            align="center"
+            sx={{
+              mb: 3,
+              color: "#c9aa77",
+              fontWeight: "bold",
+              textShadow: "0 0 10px rgba(209, 192, 122, 0.61)",
+            }}
+          >
+            Market Movers
+          </Typography>
+
+          {/* Top Gainers Section */}
+          <div style={{ marginBottom: "2rem" }}>
+            <Typography
+              variant="h4"
+              align="center"
+              sx={{ mb: 1, color: "#0ccb80", fontWeight: "bold" }}
+            >
+              Top Gainers
+            </Typography>
+            <Grid container spacing={3}>
+              {topGainers.length > 0 ? (
+                topGainers.slice(0, 6).map((stock, idx) => (
+                  <Grid item xs={12} sm={6} md={4} key={idx}>
+                    <Card
+                      sx={{
+                        background: "#2e2f46", // Dark gray background
+                        borderRadius: "15px",
+                        boxShadow: 3,
+                        transition:
+                          "transform 0.3s, box-shadow 0.3s, background-color 0.3s",
+                        "&:hover": {
+                          transform: "scale(1.05)",
+                          boxShadow: 6,
+                          backgroundColor: "#3a3b4f", // Slightly lighter on hover for contrast
+                        },
+                      }}
+                    >
+                      <CardContent sx={{ padding: "1.5rem" }}>
+                        <Grid
+                          container
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography
+                            variant="h5"
+                            fontWeight="bold"
+                            sx={{ color: "#0ccb80", fontSize: "1.6rem" }}
+                          >
+                            {stock.ticker}
+                          </Typography>
+                          <Tooltip title={`+${stock.change_percentage}%`} arrow>
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                color: "#0ccb80",
+                                display: "flex",
+                                alignItems: "center",
+                                fontWeight: "bold",
+                                fontSize: "1.2rem",
+                              }}
+                            >
+                              <ArrowUpwardIcon
+                                sx={{ fontSize: 16, marginRight: 0.5 }}
+                              />
+                              {stock.change_percentage}%
+                            </Typography>
+                          </Tooltip>
+                        </Grid>
+
+                        <Box mt={2}>
+                          <Typography
+                            variant="body1"
+                            sx={{ color: "white", fontSize: "1.1rem" }}
+                          >
+                            <strong>Price:</strong> ${stock.price}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{ color: "white", fontSize: "1.1rem" }}
+                          >
+                            <strong>Change Amount:</strong> $
+                            {stock.change_amount}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            sx={{ color: "white", fontSize: "1.1rem" }}
+                          >
+                            <strong>Volume:</strong> {stock.volume}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))
+              ) : (
+                <Grid item xs={12}>
+                  <Typography color="gray" align="center">
+                    No data available
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
           </div>
-        </center>
-      )}
+
+          {/* Top Losers Section */}
+          <div style={{ marginBottom: "2rem" }}>
+            <Typography
+              variant="h4"
+              align="center"
+              sx={{ mb: 1, color: "#f6465d", fontWeight: "bold" }}
+            >
+              Top Losers
+            </Typography>
+            <Grid container spacing={3}>
+              {topLosers.length > 0 ? (
+                topLosers.slice(0, 6).map((stock, idx) => (
+                  <Grid item xs={12} sm={6} md={4} key={idx}>
+                   <Card
+  sx={{
+    background: "#2e2f46", // Dark gray background
+    borderRadius: "15px",
+    boxShadow: 3,
+    transition: "transform 0.3s, box-shadow 0.3s, background-color 0.3s",
+    "&:hover": {
+      transform: "scale(1.05)",
+      boxShadow: 6,
+      backgroundColor: "#3a3b4f", // Slightly lighter on hover for contrast
+    },
+  }}
+>
+  <CardContent sx={{ padding: "1.5rem" }}>
+    <Grid container justifyContent="space-between" alignItems="center">
+      {/* Stock Ticker */}
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        sx={{ color: "#f6465d", fontSize: "1.6rem" }} // Red for losers
+      >
+        {stock.ticker}
+      </Typography>
+      
+      {/* Change Percentage */}
+      <Tooltip title={`-${stock.change_percentage}%`} arrow>
+        <Typography
+          variant="body1"
+          sx={{
+            color: "#f6465d", // Red for losers
+            display: "flex",
+            alignItems: "center",
+            fontWeight: "bold",
+            fontSize: "1.2rem", // Increased font size
+          }}
+        >
+          <ArrowDownwardIcon sx={{ fontSize: 18, marginRight: 0.5 }} />
+          {stock.change_percentage}%
+        </Typography>
+      </Tooltip>
+    </Grid>
+
+    {/* Stock Details */}
+    <Box mt={2}>
+      <Typography variant="body1" sx={{ color: "white", fontSize: "1.1rem" }}>
+        <strong>Price:</strong> ${stock.price}
+      </Typography>
+      <Typography variant="body1" sx={{ color: "white", fontSize: "1.1rem" }}>
+        <strong>Change Amount:</strong> ${stock.change_amount}
+      </Typography>
+      <Typography variant="body1" sx={{ color: "white", fontSize: "1.1rem" }}>
+        <strong>Volume:</strong> {stock.volume}
+      </Typography>
+    </Box>
+  </CardContent>
+</Card>
+
+                  </Grid>
+                ))
+              ) : (
+                <Grid item xs={12}>
+                  <Typography color="gray" align="center">
+                    No data available
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </div>
+
+          {/* Most Active Section */}
+          <div>
+            <Typography
+              variant="h4"
+              align="center"
+              sx={{ mb: 1, color: "#808080", fontWeight: "bold" }}
+            >
+              Most Active
+            </Typography>
+            <Grid container spacing={3}>
+              {mostActive.length > 0 ? (
+                mostActive.slice(0, 6).map((stock, idx) => (
+                  <Grid item xs={12} sm={6} md={4} key={idx}>
+                    <Card
+  sx={{
+    background: "#2e2f46", // Dark gray background
+    borderRadius: "15px",
+    boxShadow: 3,
+    transition: "transform 0.3s, box-shadow 0.3s, background-color 0.3s",
+    "&:hover": {
+      transform: "scale(1.05)",
+      boxShadow: 6,
+      backgroundColor: "#3a3b4f", // Slightly lighter on hover for contrast
+    },
+  }}
+>
+  <CardContent sx={{ padding: "1.5rem" }}>
+    <Grid container justifyContent="space-between" alignItems="center">
+      {/* Stock Ticker */}
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        sx={{ color: "#808080", fontSize: "1.6rem" }} // Lighter gray for most active
+      >
+        {stock.ticker}
+      </Typography>
+
+      {/* Change Percentage */}
+      <Tooltip title={`${stock.change_percentage}%`} arrow>
+        <Typography
+          variant="body1"
+          sx={{
+            color: "#808080", // Light gray for most active percentage
+            display: "flex",
+            alignItems: "center",
+            fontWeight: "bold",
+            fontSize: "1.2rem", // Increased font size
+          }}
+        >
+          {stock.change_percentage}%
+        </Typography>
+      </Tooltip>
+    </Grid>
+
+    {/* Stock Details */}
+    <Box mt={2}>
+      <Typography variant="body1" sx={{ color: "white", fontSize: "1.1rem" }}>
+        <strong>Price:</strong> ${stock.price}
+      </Typography>
+      <Typography variant="body1" sx={{ color: "white", fontSize: "1.1rem" }}>
+        <strong>Change Amount:</strong> ${stock.change_amount}
+      </Typography>
+      <Typography variant="body1" sx={{ color: "white", fontSize: "1.1rem" }}>
+        <strong>Volume:</strong> {stock.volume}
+      </Typography>
+    </Box>
+  </CardContent>
+</Card>
+
+                  </Grid>
+                ))
+              ) : (
+                <Grid item xs={12}>
+                  <Typography color="gray" align="center">
+                    No data available
+                  </Typography>
+                </Grid>
+              )}
+            </Grid>
+          </div>
+        </section>
+      </main>
     </>
   );
 }
 
-export default Apitest;
+export default ApiTest;
