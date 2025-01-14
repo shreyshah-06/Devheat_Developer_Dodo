@@ -1,115 +1,88 @@
-# PaperMarket
+# **PaperMarket**
 
-<br/>
-
-<p align="center">
-<img src="./snapshots/img (6).png" width="720"/>
-</p>
-
-# Problems Solved
-
-```
-- Share market investing is often encouraged nowadays, since not only does it beat inflation but seldom also brings exponential returns.
-
-- Investing however can be a tedious task for many beginners since share trading platforms can often be overwhelming.
-
-- This in turn restricts users, for it presents the risk of putting people's savings at stake.
-
-- This is where paper trading or demo trading comes in to help.
-
-- Using a demo account allows first time traders to experience and trade with an account that looks and acts similarly to the real online trading accounts traders use. 
-
-```
 <p align="center">
 <img src="./snapshots/img (2).png" width="720"/>
 </p>
 
+---
 
-# Feature 1 : Real time stock updates
+## **Introduction**
+Investing in the stock market is a powerful tool to beat inflation and achieve exponential returns. However, for beginners, trading platforms can feel overwhelming, posing risks to their savings.  
 
-```
+**PaperMarket** bridges this gap by providing a secure and intuitive **paper trading platform**. It simulates real trading experiences, enabling users to learn, analyze, and gain confidence without risking their money.
 
-- Users can tracks shares of any company live time. 
+---
 
-- Users can see live time share performance in form of candle-sticks to get the feel of a actual trading platform.
+## **Key Features**
 
-- Users can track live market conditions.
-
- ```
-
-# Feature 2 : Stock Analysis
-
-```
-
-- Users can analyse and pick stocks meticulously with the help of our stock profiles. 
-
-- Stock profiling is done based on various parameters res such as previous calls, market volume and caps (upper or lower).
-
-- Stocks are listed to give an idea to users about overall market conditions (bearish/bullish trends).
-
-```
-
-
-# Feature 3 : Fully Secured
-
-```
-
-- Confidential User data such as passwords, transaction history and call puts are saved securely on our private server databases.
-
-- User profile info is locked and is accessible only after sign in.
-
-- User call puts are securely transferred to the market ensuring authentic results.
-
-```
+### **1. Real-Time Stock Updates**
+- Track live stock performance and market trends.
+- Analyze stocks using **candlestick charts** for an authentic trading experience.
+- Stay informed with up-to-the-minute market data.
 
 <p align="center">
-<img src="./snapshots/img (1).png" width="720"/>
-<br/>
-<img src="./snapshots/img (3).png" width="720"/>
+<img src="./snapshots/chart.png" width="720"/>
 </p>
+
+---
+
+### **2. Stock Analysis**
+- Explore detailed stock profiles based on:
+  - Previous trends and calls.
+  - Market volume and caps (upper/lower limits).
+- Understand overall market conditions (bearish/bullish trends) to make informed decisions.
 
 <p align="center">
-<img src="./snapshots/img (5).png" width="720"/>
+<img src="./snapshots/analysis.png" width="720"/>
 </p>
 
+---
+
+### **3. Enhanced Security**
+- Secure storage of confidential user data (passwords, transaction history, and trades) on private servers.
+- Profile data is encrypted and accessible only after sign-in.
+- Ensures secure transfer of user trades to deliver reliable and authentic results.
+
+### **4. User Dashboard**
+- Intuitive interface displaying key stats like:
+  - Current portfolio value.
+  - Recent transactions and trade history.
+  - Personalized stock suggestions and alerts.
 
 <p align="center">
-<img src="./snapshots/img (4).png" width="720"/>
+<img src="./snapshots/dashboard.png" width="720"/>
 </p>
 
+---
 
-# About This App
+## **Why Choose PaperMarket?**
+- **Learn by Doing**: Experience trading with a real-time simulated environment.
+- **Safe Space**: Avoid the risk of losing money while gaining confidence.
+- **Intuitive Interface**: Simplified and user-friendly design.
 
-```
-- User can register using their Email accounts.
+---
 
-- Users can learn how to trade through reading the trends through the chart.
+## **Tech Stack**
+- **Frontend**: HTML, CSS, React.js, MUI.
+- **Backend**: Node.js, Express.js.
+- **Database**: MongoDB.
+- **Security**: JWT.
 
-- The website is fully encrypted.
+---
 
+## **Challenges Faced**
+1. Plotting candlestick charts:
+   - Researched and utilized appropriate libraries for accurate representation.
+2. API Integration:
+   - Identified and integrated reliable APIs for real-time data.
+3. Security:
+   - Implemented encryption for sensitive user data and ensured secure trade transfers to prevent unauthorized access.
 
-```
+---
 
-###
+## **About This App**
+- Register using your email to create a secure account.
+- Learn trading by analyzing stock trends through interactive charts.
+- Fully encrypted and secure platform.
 
-## 🛠 Tech Used ||
-
-```bash
-HTML, CSS, React.js, NodeJS, MongoDB, ExpressJs, JWT, MUI
-```
-
-## Problems faced
-
-```
-- We didn't have any knowledge about ML but we tried to learn as much we could and implemented it.
-
-- Plotting the candlestick chart on the page.
-
-- Finding the right API's to get the desired results.
-```
-
-## Developers
-
-## [Nachiket](https://github.com/Nach-33), [Rutwik](https://github.com/rutwik2514), [Shrey](https://github.com/shreyshah-06)
-
-<br/>
+---
